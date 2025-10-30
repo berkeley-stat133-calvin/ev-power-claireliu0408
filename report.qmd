@@ -11,29 +11,102 @@ format: typst
 library(ggplot2)
 library(stringr)
 library(dplyr)
-library(tidyverse)
+library(maps)
 ```
 
 ## **Part 1:** **Defining Research Question**
 
 Chosen Question:
-How does the average energy price affects the usage of EV cars? 
+How have different energy sources changed from 2021 to 2023, and what is the relationship between these trends and electric vehicle (EV) registrations during the same period in California?
 
 ## **Part 2: Data Preparation and Cleaning**
 
 ```{r}
-av_energy_price <- read_csv("data/av-energy-price-2021-2023.csv")
-head(av_energy_price)
+eu_21 <- read_csv("data/total-use-2021.csv")
+eu_22 <- read_csv("data/total-use-2022.csv")
+eu_23 <- read_csv("data/total-use-2023.csv")
+
+eu_21 <- eu_21 |> mutate(Energy_Source = recode(Energy_Source, "Coal" = "Coal", 
+            "Natural Gas†" = "Natural Gas",
+            "Petroleum (BTU)" = "Petroleum", 
+            "nuclear" = "Nuclear", 
+            "total_renewable_energy" = "Total renewable energy"
+            ))
+
+eu_22 <- eu_22 |> mutate(Energy_Source = recode(Energy_Source, "coal Consumption" = "Coal", 
+            "Natural-Gas" = "Natural Gas",
+            "petroleum (btu)" = "Petroleum", 
+            "Nuclear Energy†" = "Nuclear", 
+            "total_renewables" = "Total renewable energy"
+            ))
+
+eu_23 <- eu_23|> mutate(Energy_Source = recode(Energy_Source, "coal_usage" = "Coal", 
+            "NaturalGas" = "Natural Gas",
+            "petroleum (BTU)" = "Petroleum", 
+            "nuclear-energy †" = "Nuclear", 
+            "total renewable-energy" = "Total renewable energy"
+            ))
 ```
+
 
 ## **Part 3: Joining / Pivoting Datasets for Analysis**
 
 ```{r}
+energy_long_21 <- eu_21 |>  
+  pivot_longer(
+    cols = -Energy_Source,       
+    names_to = "State",          
+    values_to = "2021"     
+  )
 
+energy_long_22 <- eu_22 |>  
+  pivot_longer(
+    cols = -Energy_Source,       
+    names_to = "State",          
+    values_to = "2022"     
+  )
+
+energy_long_23 <- eu_23 |>  
+  pivot_longer(
+    cols = -Energy_Source,       
+    names_to = "State",          
+    values_to = "2023"     
+  )
+
+combined <- energy_long_21 |> 
+  left_join(energy_long_22, by = c("Energy_Source", "State")) |> 
+  left_join(energy_long_23, by = c("Energy_Source", "State"))
+
+renewable_energy <- combined |> filter(Energy_Source == "Total renewable energy")
+renewable_long <- renewable_energy |> 
+  pivot_longer(
+    cols = c("2021","2022","2023"),
+    names_to = "Year",
+    values_to = "Energy_Use"
+  ) |> select(-c(1))
+
+  state_map <- data.frame(
+  Abbrev = state.abb,
+  State_Full = tolower(state.name)
+)
+
+renewable_long <- renewable_long |> 
+  left_join(state_map, by = c("State" = "Abbrev"))
 ```
 
 ## **Part 4: Mapping Visualization**
 
 ```{r}
+us_map <- map_data("state")
 
+map_data_ready <- us_map |> 
+  left_join(renewable_long, by = c("region" = "State_Full"), relationship = "many-to-many")
+
+ggplot(map_data_ready) +
+  geom_polygon(aes(x = long, y = lat, group = group, fill = Energy_Use), color = "white") +
+  facet_wrap(~Year) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(title = "Renewable Energy Usage by State (2021-2023)",
+       fill = "Energy Use (BTU)") +
+  theme_minimal()
 ```
