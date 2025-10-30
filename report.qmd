@@ -8,17 +8,22 @@ format: typst
 ## **Part 0: libraries**
 
 ```{r}
-
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(tidyverse)
 ```
 
 ## **Part 1:** **Defining Research Question**
 
 Chosen Question:
+How does the average energy price affects the usage of EV cars? 
 
 ## **Part 2: Data Preparation and Cleaning**
 
 ```{r}
-
+av_energy_price <- read_csv("data/av-energy-price-2021-2023.csv")
+head(av_energy_price)
 ```
 
 ## **Part 3: Joining / Pivoting Datasets for Analysis**
