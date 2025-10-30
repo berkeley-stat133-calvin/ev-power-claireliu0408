@@ -3,7 +3,6 @@ title: "EV Power - Lab 4 Project Report"
 format: typst
 ---
 
-# Example Solution 1
 
 ## **Part 0: libraries**
 
@@ -20,6 +19,9 @@ library(tidyverse)
 
 Chosen Question:
 How does renewable energy usage changed from 2021–2023 across states?
+
+In this report, I will analyze trends in renewable energy usage across US states from 2021 to 2023. 
+
 
 ## **Part 2: Data Preparation and Cleaning**
 
@@ -112,3 +114,6 @@ ggplot(map_data_ready) +
        fill = "Energy Use (BTU)") +
   theme_minimal()
 ```
+
+## **Part 5: Analysis**
+Renewable energy usage differs widely by state, with some states like California and New York have very high usage. Comparing 2021 to 2023, most states show an increasing trend in renewable energy usage. These patterns help us understand potential correlations with electric vehicle adoption, states with higher renewable energy may support EV infrastructure better.
