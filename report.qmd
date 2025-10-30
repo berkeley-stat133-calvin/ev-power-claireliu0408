@@ -12,12 +12,14 @@ library(ggplot2)
 library(stringr)
 library(dplyr)
 library(maps)
+library(readr)
+library(tidyverse)
 ```
 
 ## **Part 1:** **Defining Research Question**
 
 Chosen Question:
-How have different energy sources changed from 2021 to 2023, and what is the relationship between these trends and electric vehicle (EV) registrations during the same period in California?
+How does renewable energy usage changed from 2021–2023 across states?
 
 ## **Part 2: Data Preparation and Cleaning**
 
